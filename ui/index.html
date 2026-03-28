@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Binance Futures Trading Bot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0b0e14;
+      --surface: #111722;
+      --surface2: #161d2b;
+      --border: #1e2d42;
+      --accent: #f0b90b;
+      --accent-dim: rgba(240,185,11,0.12);
+      --green: #0ecb81;
+      --green-dim: rgba(14,203,129,0.12);
+      --red: #f6465d;
+      --red-dim: rgba(246,70,93,0.12);
+      --blue: #1890ff;
+      --blue-dim: rgba(24,144,255,0.12);
+      --text: #eaecef;
+      --muted: #848e9c;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: -0.3px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .logo span { color: var(--accent); }
+
+    .badge {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(240,185,11,0.3);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .header-right { display: flex; align-items: center; gap: 14px; }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .status-label { font-size: 12px; color: var(--muted); }
+
+    /* ── LAYOUT ── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-icon { font-size: 16px; }
+    .card-body { padding: 24px; }
+
+    /* ── SIDE TOGGLE ── */
+    .side-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 4px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .side-btn {
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: transparent;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+    }
+
+    .side-btn.buy.active {
+      background: var(--green);
+      color: #000;
+      box-shadow: 0 0 20px rgba(14,203,129,0.3);
+    }
+
+    .side-btn.sell.active {
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(246,70,93,0.3);
+    }
+
+    .side-btn:not(.active):hover { color: var(--text); background: var(--surface2); }
+
+    /* ── FORM ELEMENTS ── */
+    .form-group { margin-bottom: 16px; }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 8px;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      appearance: none;
+    }
+
+    .form-input:focus, .form-select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+
+    .form-input::placeholder { color: var(--muted); }
+
+    .form-select option { background: var(--surface2); }
+
+    .type-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .type-tab {
+      padding: 8px 4px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--bg);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      letter-spacing: 0.3px;
+    }
+
+    .type-tab:hover { color: var(--text); border-color: var(--accent); }
+
+    .type-tab.active {
+      background: var(--accent-dim);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── SUBMIT BUTTON ── */
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 8px;
+      letter-spacing: 0.3px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .submit-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.1);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .submit-btn:hover::after { opacity: 1; }
+
+    .submit-btn.buy {
+      background: var(--green);
+      color: #000;
+      box-shadow: 0 4px 20px rgba(14,203,129,0.25);
+    }
+
+    .submit-btn.sell {
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(246,70,93,0.25);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ── RIGHT COLUMN ── */
+    .right-col { display: flex; flex-direction: column; gap: 24px; }
+
+    /* ── RESULT CARD ── */
+    .result-empty {
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .result-empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .result-empty p { font-size: 13px; }
+
+    .result-content { padding: 24px; }
+
+    .result-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .result-badge.success { background: var(--green-dim); color: var(--green); }
+    .result-badge.error { background: var(--red-dim); color: var(--red); }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .result-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .result-item-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    .result-item-value {
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text);
+    }
+
+    .result-item-value.green { color: var(--green); }
+    .result-item-value.red { color: var(--red); }
+    .result-item-value.accent { color: var(--accent); }
+
+    .error-box {
+      background: var(--red-dim);
+      border: 1px solid rgba(246,70,93,0.3);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 24px;
+      font-size: 13px;
+      color: var(--red);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── LOGS ── */
+    .logs-container {
+      padding: 16px;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .logs-container::-webkit-scrollbar { width: 4px; }
+    .logs-container::-webkit-scrollbar-track { background: transparent; }
+    .logs-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .log-line {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      line-height: 1.6;
+      word-break: break-all;
+    }
+
+    .log-line.info { color: var(--blue); }
+    .log-line.error { color: var(--red); }
+    .log-line.warning { color: var(--accent); }
+
+    .logs-empty { text-align: center; padding: 32px; color: var(--muted); font-size: 13px; }
+
+    /* ── SPINNER ── */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── HISTORY ── */
+    .history-list { padding: 0 16px 16px; }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-top: 10px;
+      transition: border-color 0.2s;
+    }
+
+    .history-item:hover { border-color: var(--accent); }
+
+    .history-left { display: flex; align-items: center; gap: 10px; }
+
+    .history-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+
+    .history-dot.buy { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .history-dot.sell { background: var(--red); box-shadow: 0 0 6px var(--red); }
+
+    .history-symbol { font-weight: 600; font-size: 13px; }
+    .history-meta { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+    .history-id { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .container { grid-template-columns: 1fr; }
+    }
+
+    /* ── CONDITIONAL FIELDS ── */
+    .conditional { display: none; }
+    .conditional.show { display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">₿</div>
+    Binance <span>Futures</span> Bot
+    <div class="badge">TESTNET</div>
+  </div>
+  <div class="header-right">
+    <div class="status-dot" id="statusDot"></div>
+    <span class="status-label" id="statusLabel">Connected</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- LEFT: ORDER FORM -->
+  <div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="card-icon">📋</span> Place Order</div>
+      </div>
+      <div class="card-body">
+
+        <!-- BUY / SELL Toggle -->
+        <div class="side-toggle">
+          <button class="side-btn buy active" id="btnBuy" onclick="setSide('BUY')">BUY</button>
+          <button class="side-btn sell" id="btnSell" onclick="setSide('SELL')">SELL</button>
+        </div>
+
+        <!-- Order Type -->
+        <div class="form-group">
+          <div class="form-label">Order Type</div>
+          <div class="type-tabs">
+            <div class="type-tab active" onclick="setType('MARKET')">MARKET</div>
+            <div class="type-tab" onclick="setType('LIMIT')">LIMIT</div>
+            <div class="type-tab" onclick="setType('STOP')">STOP</div>
+            <div class="type-tab" onclick="setType('STOP_MARKET')">STOP MKT</div>
+          </div>
+        </div>
+
+        <!-- Symbol -->
+        <div class="form-group">
+          <label class="form-label">Symbol</label>
+          <select class="form-select" id="symbol">
+            <option>BTCUSDT</option>
+            <option>ETHUSDT</option>
+            <option>BNBUSDT</option>
+            <option>SOLUSDT</option>
+            <option>XRPUSDT</option>
+            <option>DOGEUSDT</option>
+            <option>ADAUSDT</option>
+          </select>
+        </div>
+
+        <!-- Quantity -->
+        <div class="form-group">
+          <label class="form-label">Quantity</label>
+          <input type="number" class="form-input" id="quantity" placeholder="e.g. 0.01" step="0.001" min="0.001" />
+        </div>
+
+        <!-- Price (LIMIT / STOP) -->
+        <div class="form-group conditional" id="priceGroup">
+          <label class="form-label">Limit Price (USDT)</label>
+          <input type="number" class="form-input" id="price" placeholder="e.g. 85000" step="0.01" />
+        </div>
+
+        <!-- Stop Price (STOP / STOP_MARKET) -->
+        <div class="form-group conditional" id="stopPriceGroup">
+          <label class="form-label">Stop Trigger Price (USDT)</label>
+          <input type="number" class="form-input" id="stopPrice" placeholder="e.g. 84000" step="0.01" />
+        </div>
+
+        <!-- Submit -->
+        <button class="submit-btn buy" id="submitBtn" onclick="placeOrder()">
+          Place BUY Order
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="right-col">
+
+    <!-- RESULT -->
+    <div class="card" id="resultCard">
+      <div class="card-header">
+        <div class="card-title"><span class="card-icon">✅</span> Order Result</div>
+      </div>
+      <div class="result-empty" id="resultEmpty">
+        <div class="result-empty-icon">📊</div>
+        <p>Place an order to see the result here</p>
+      </div>
+      <div id="resultContent" style="display:none;"></div>
+    </div>
+
+    <!-- ORDER HISTORY -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="card-icon">🕒</span> Order History</div>
+        <span style="font-size:11px; color:var(--muted);" id="historyCount">0 orders</span>
+      </div>
+      <div id="historyList" class="history-list">
+        <div class="logs-empty">No orders yet this session</div>
+      </div>
+    </div>
+
+    <!-- LOGS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="card-icon">🗒️</span> Live Logs</div>
+        <button onclick="loadLogs()" style="background:var(--surface2); border:1px solid var(--border); color:var(--muted); border-radius:6px; padding:4px 10px; font-size:11px; cursor:pointer;">Refresh</button>
+      </div>
+      <div class="logs-container" id="logsContainer">
+        <div class="logs-empty">Loading logs…</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let currentSide = 'BUY';
+  let currentType = 'MARKET';
+  let orderHistory = [];
+
+  // ── Side Toggle ──
+  function setSide(side) {
+    currentSide = side;
+    document.getElementById('btnBuy').classList.toggle('active', side === 'BUY');
+    document.getElementById('btnSell').classList.toggle('active', side === 'SELL');
+    const btn = document.getElementById('submitBtn');
+    btn.className = `submit-btn ${side.toLowerCase()}`;
+    btn.textContent = `Place ${side} Order`;
+  }
+
+  // ── Order Type Tabs ──
+  function setType(type) {
+    currentType = type;
+    document.querySelectorAll('.type-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('priceGroup').classList.toggle('show', ['LIMIT', 'STOP'].includes(type));
+    document.getElementById('stopPriceGroup').classList.toggle('show', ['STOP', 'STOP_MARKET'].includes(type));
+  }
+
+  // ── Place Order ──
+  async function placeOrder() {
+    const btn = document.getElementById('submitBtn');
+    const qty = document.getElementById('quantity').value;
+    const price = document.getElementById('price').value;
+    const stopPrice = document.getElementById('stopPrice').value;
+    const symbol = document.getElementById('symbol').value;
+
+    if (!qty || parseFloat(qty) <= 0) {
+      showError('Please enter a valid quantity');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner"></span>Placing order…`;
+
+    try {
+      const res = await fetch('/api/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          symbol, side: currentSide, type: currentType,
+          quantity: qty,
+          price: price || null,
+          stop_price: stopPrice || null
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        showResult(data.data);
+        addToHistory(data.data, symbol);
+      } else {
+        showError(data.error || 'Unknown error');
+      }
+    } catch (err) {
+      showError('Network error: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `Place ${currentSide} Order`;
+      loadLogs();
+    }
+  }
+
+  // ── Show Result ──
+  function showResult(d) {
+    document.getElementById('resultEmpty').style.display = 'none';
+    const side = d.side || 'BUY';
+    const isGreen = side === 'BUY';
+    document.getElementById('resultContent').style.display = 'block';
+    document.getElementById('resultContent').innerHTML = `
+      <div class="result-content">
+        <div class="result-badge success">✓ Order Placed Successfully</div>
+        <div class="result-grid">
+          <div class="result-item">
+            <div class="result-item-label">Order ID</div>
+            <div class="result-item-value accent">${d.orderId || '—'}</div>
+          </div>
+          <div class="result-item">
+            <div class="result-item-label">Status</div>
+            <div class="result-item-value ${d.status === 'FILLED' ? 'green' : ''}">${d.status || '—'}</div>
+          </div>
+          <div class="result-item">
+            <div class="result-item-label">Symbol</div>
+            <div class="result-item-value">${d.symbol || '—'}</div>
+          </div>
+          <div class="result-item">
+            <div class="result-item-label">Side</div>
+            <div class="result-item-value ${isGreen ? 'green' : 'red'}">${d.side || '—'}</div>
+          </div>
+          <div class="result-item">
+            <div class="result-item-label">Type</div>
+            <div class="result-item-value">${d.type || '—'}</div>
+          </div>
+          <div class="result-item">
+            <div class="result-item-label">Quantity</div>
+            <div class="result-item-value">${d.origQty || '—'}</div>
+          </div>
+          <div class="result-item">
+            <div class="result-item-label">Executed Qty</div>
+            <div class="result-item-value">${d.executedQty || '0'}</div>
+          </div>
+          <div class="result-item">
+            <div class="result-item-label">Avg Price</div>
+            <div class="result-item-value">${parseFloat(d.avgPrice || 0) > 0 ? '$' + parseFloat(d.avgPrice).toLocaleString() : 'MARKET'}</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function showError(msg) {
+    document.getElementById('resultEmpty').style.display = 'none';
+    document.getElementById('resultContent').style.display = 'block';
+    document.getElementById('resultContent').innerHTML = `<div class="error-box">❌ ${msg}</div>`;
+  }
+
+  // ── Order History ──
+  function addToHistory(d, symbol) {
+    orderHistory.unshift({ ...d, symbol });
+    const list = document.getElementById('historyList');
+    document.getElementById('historyCount').textContent = `${orderHistory.length} order${orderHistory.length !== 1 ? 's' : ''}`;
+    list.innerHTML = orderHistory.slice(0, 10).map(o => `
+      <div class="history-item">
+        <div class="history-left">
+          <div class="history-dot ${(o.side || 'BUY').toLowerCase()}"></div>
+          <div>
+            <div class="history-symbol">${o.symbol} <span style="color:var(--muted); font-weight:400; font-size:12px;">${o.type}</span></div>
+            <div class="history-meta">${o.side} · qty ${o.origQty}</div>
+          </div>
+        </div>
+        <div class="history-id">#${o.orderId}</div>
+      </div>`).join('');
+  }
+
+  // ── Logs ──
+  async function loadLogs() {
+    try {
+      const res = await fetch('/api/logs');
+      const data = await res.json();
+      const el = document.getElementById('logsContainer');
+      if (!data.logs || data.logs.length === 0) {
+        el.innerHTML = '<div class="logs-empty">No logs yet</div>';
+        return;
+      }
+      el.innerHTML = data.logs.reverse().map(line => {
+        let cls = 'log-line';
+        if (line.includes('ERROR') || line.includes('error')) cls += ' error';
+        else if (line.includes('WARNING')) cls += ' warning';
+        else if (line.includes('INFO')) cls += ' info';
+        return `<div class="${cls}">${line}</div>`;
+      }).join('');
+    } catch (e) {
+      document.getElementById('logsContainer').innerHTML = '<div class="logs-empty">Could not load logs</div>';
+    }
+  }
+
+  // Init
+  loadLogs();
+  setInterval(loadLogs, 10000);
+</script>
+</body>
+</html>
