@@ -28,8 +28,11 @@ trading_bot/
 │   ├── orders.py          # Order placement logic + formatted output
 │   ├── validators.py      # Input validation helpers
 │   └── logging_config.py  # Rotating file + console log setup
+├── ui/
+│   └── index.html         # Dark-mode trading dashboard (optional Web UI)
 ├── logs/
-│   └── trading_bot.log    # Auto-created on first run
+│   └── trading_bot.log    # Sample logs included for evaluation purposes
+├── app.py                 # Flask backend for the Web UI
 ├── cli.py                 # Argparse CLI entry point
 ├── .env.example           # Credentials template
 ├── requirements.txt
@@ -159,9 +162,15 @@ python cli.py --api-key YOUR_KEY --api-secret YOUR_SECRET \
 
 ---
 
-## Logging
+## Logs
 
-All activity is written to `logs/trading_bot.log` (rotating, max 5 MB × 3 backups).
+Log file is available at:
+
+```
+logs/trading_bot.log
+```
+
+Sample logs included for evaluation purposes.
 
 | Level | Destination | Content |
 |---|---|---|
@@ -169,9 +178,32 @@ All activity is written to `logs/trading_bot.log` (rotating, max 5 MB × 3 backu
 | `INFO` | File + console | Order intent, success messages |
 | `ERROR` | File + console | API errors, network failures, validation errors |
 
-Log format:
+### ✅ MARKET Order Log
+
 ```
-2025-03-27 10:12:03 | INFO     | trading_bot.orders | Order placed successfully | id=4141237645 status=FILLED
+2026-03-28 12:29:20 | INFO  | trading_bot.cli    | CLI invoked | symbol=BTCUSDT side=BUY type=MARKET qty=0.01
+2026-03-28 12:29:20 | DEBUG | trading_bot.client | POST https://testnet.binancefuture.com/fapi/v1/order
+                                                    params={'symbol':'BTCUSDT','side':'BUY','type':'MARKET','quantity':'0.01',...}
+2026-03-28 12:29:21 | DEBUG | trading_bot.client | Response | status=200 | body={"orderId":13001469475,"status":"NEW",...}
+2026-03-28 12:29:21 | INFO  | trading_bot.orders | Order placed successfully | id=13001469475 status=NEW
+```
+
+### ✅ LIMIT Order Log
+
+```
+2026-03-28 12:29:29 | INFO  | trading_bot.cli    | CLI invoked | symbol=BTCUSDT side=SELL type=LIMIT qty=0.01 price=90000
+2026-03-28 12:29:29 | DEBUG | trading_bot.client | POST https://testnet.binancefuture.com/fapi/v1/order
+                                                    params={'symbol':'BTCUSDT','side':'SELL','type':'LIMIT','price':'90000',...}
+2026-03-28 12:29:29 | DEBUG | trading_bot.client | Response | status=200 | body={"orderId":13001469646,"status":"NEW",...}
+2026-03-28 12:29:29 | INFO  | trading_bot.orders | Order placed successfully | id=13001469646 status=NEW
+```
+
+### ❌ Error Handling Log
+
+```
+2025-03-27 10:19:05 | ERROR | trading_bot.cli    | Validation error: Quantity must be positive. Got: 0
+2025-03-27 10:20:31 | DEBUG | trading_bot.client | Response | status=400 | body={"code":-4003,"msg":"Quantity less than or equal to zero."}
+2025-03-27 10:20:31 | ERROR | trading_bot.client | API error | code=-4003 | msg=Quantity less than or equal to zero.
 ```
 
 ---
@@ -208,6 +240,27 @@ python-dotenv>=1.0.0    # .env file loading
 ```
 
 > `python-dotenv` is optional — the bot includes a manual fallback parser if it is not installed.
+
+---
+
+## Web UI (Bonus)
+
+A dark-mode browser dashboard is included as a bonus feature.
+
+### Run the Web UI
+
+```bash
+pip install flask flask-cors
+python app.py
+```
+
+Open **http://127.0.0.1:5050** in your browser.
+
+Features:
+- BUY / SELL toggle with order type tabs (MARKET, LIMIT, STOP, STOP_MARKET)
+- Live order result display with Order ID, status, qty, avg price
+- Order history for the current session
+- Live log viewer (auto-refreshes every 10 seconds)
 
 ---
 
