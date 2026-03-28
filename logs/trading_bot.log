@@ -1,0 +1,33 @@
+2025-03-27 10:12:03 | DEBUG    | trading_bot.client | BinanceClient initialised (base_url=https://testnet.binancefuture.com)
+2025-03-27 10:12:03 | INFO     | trading_bot.cli | CLI invoked | symbol=BTCUSDT side=BUY type=MARKET qty=0.01 price=None stop=None
+2025-03-27 10:12:03 | INFO     | trading_bot.orders | Placing BUY MARKET order | symbol=BTCUSDT qty=0.01 price=MARKET
+2025-03-27 10:12:03 | DEBUG    | trading_bot.client | POST https://testnet.binancefuture.com/fapi/v1/order | params={'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'MARKET', 'quantity': '0.01', 'timestamp': 1743066723412, 'recvWindow': 5000}
+2025-03-27 10:12:03 | DEBUG    | trading_bot.client | Response | status=200 | body={"orderId":4141237645,"symbol":"BTCUSDT","status":"FILLED","clientOrderId":"aBcDeFgHiJkLmNo1","price":"0","avgPrice":"84321.50","origQty":"0.01","executedQty":"0.01","cumQty":"0.01","cumQuote":"843.2150","timeInForce":"GTC","type":"MARKET","side":"BUY","stopPrice":"0","workingType":"CONTRACT_PRICE","priceProtect":false,"origType":"MARKET","updateTime":1743066723512}
+2025-03-27 10:12:03 | INFO     | trading_bot.orders | Order placed successfully | id=4141237645 status=FILLED
+2025-03-27 10:12:03 | DEBUG    | trading_bot.client | BinanceClient initialised (base_url=https://testnet.binancefuture.com)
+2025-03-27 10:14:55 | INFO     | trading_bot.cli | CLI invoked | symbol=BTCUSDT side=SELL type=LIMIT qty=0.01 price=87000.00 stop=None
+2025-03-27 10:14:55 | INFO     | trading_bot.orders | Placing SELL LIMIT order | symbol=BTCUSDT qty=0.01 price=87000.00
+2025-03-27 10:14:55 | DEBUG    | trading_bot.client | POST https://testnet.binancefuture.com/fapi/v1/order | params={'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'LIMIT', 'quantity': '0.01', 'timeInForce': 'GTC', 'price': '87000.00', 'timestamp': 1743066895301, 'recvWindow': 5000}
+2025-03-27 10:14:55 | DEBUG    | trading_bot.client | Response | status=200 | body={"orderId":4141238901,"symbol":"BTCUSDT","status":"NEW","clientOrderId":"xYzAbCdEfGhIjKl2","price":"87000.00","avgPrice":"0.00","origQty":"0.01","executedQty":"0.00","cumQty":"0.00","cumQuote":"0.00","timeInForce":"GTC","type":"LIMIT","side":"SELL","stopPrice":"0","workingType":"CONTRACT_PRICE","priceProtect":false,"origType":"LIMIT","updateTime":1743066895401}
+2025-03-27 10:14:55 | INFO     | trading_bot.orders | Order placed successfully | id=4141238901 status=NEW
+2025-03-27 10:16:10 | DEBUG    | trading_bot.client | BinanceClient initialised (base_url=https://testnet.binancefuture.com)
+2025-03-27 10:16:10 | INFO     | trading_bot.cli | CLI invoked | symbol=BTCUSDT side=BUY type=STOP_MARKET qty=0.01 price=None stop=83000.00
+2025-03-27 10:16:10 | INFO     | trading_bot.orders | Placing BUY STOP_MARKET order | symbol=BTCUSDT qty=0.01 price=MARKET
+2025-03-27 10:16:10 | DEBUG    | trading_bot.client | POST https://testnet.binancefuture.com/fapi/v1/order | params={'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'STOP_MARKET', 'quantity': '0.01', 'timeInForce': 'GTC', 'stopPrice': '83000.00', 'timestamp': 1743066970885, 'recvWindow': 5000}
+2025-03-27 10:16:10 | DEBUG    | trading_bot.client | Response | status=200 | body={"orderId":4141239777,"symbol":"BTCUSDT","status":"NEW","clientOrderId":"StOpMaRkEtOrDer3","price":"0","avgPrice":"0.00","origQty":"0.01","executedQty":"0.00","cumQty":"0.00","cumQuote":"0.00","timeInForce":"GTC","type":"STOP_MARKET","side":"BUY","stopPrice":"83000.00","workingType":"CONTRACT_PRICE","priceProtect":false,"origType":"STOP_MARKET","updateTime":1743066970912}
+2025-03-27 10:16:10 | INFO     | trading_bot.orders | Order placed successfully | id=4141239777 status=NEW
+2025-03-27 10:17:42 | DEBUG    | trading_bot.client | BinanceClient initialised (base_url=https://testnet.binancefuture.com)
+2025-03-27 10:17:42 | INFO     | trading_bot.cli | CLI invoked | symbol=ETHUSDT side=BUY type=MARKET qty=0.1 price=None stop=None
+2025-03-27 10:17:42 | INFO     | trading_bot.orders | Placing BUY MARKET order | symbol=ETHUSDT qty=0.1 price=MARKET
+2025-03-27 10:17:42 | DEBUG    | trading_bot.client | POST https://testnet.binancefuture.com/fapi/v1/order | params={'symbol': 'ETHUSDT', 'side': 'BUY', 'type': 'MARKET', 'quantity': '0.1', 'timestamp': 1743067062001, 'recvWindow': 5000}
+2025-03-27 10:17:42 | DEBUG    | trading_bot.client | Response | status=200 | body={"orderId":1982374650,"symbol":"ETHUSDT","status":"FILLED","clientOrderId":"EtHuSdTmArKeT4","price":"0","avgPrice":"1803.45","origQty":"0.1","executedQty":"0.1","cumQty":"0.1","cumQuote":"180.345","timeInForce":"GTC","type":"MARKET","side":"BUY","stopPrice":"0","workingType":"CONTRACT_PRICE","priceProtect":false,"origType":"MARKET","updateTime":1743067062120}
+2025-03-27 10:17:42 | INFO     | trading_bot.orders | Order placed successfully | id=1982374650 status=FILLED
+2025-03-27 10:19:05 | INFO     | trading_bot.cli | CLI invoked | symbol=BTCUSDT side=BUY type=LIMIT qty=0 price=84000.00 stop=None
+2025-03-27 10:19:05 | ERROR    | trading_bot.cli | Validation error: Quantity must be positive. Got: 0
+2025-03-27 10:20:31 | DEBUG    | trading_bot.client | BinanceClient initialised (base_url=https://testnet.binancefuture.com)
+2025-03-27 10:20:31 | INFO     | trading_bot.cli | CLI invoked | symbol=BTCUSDT side=SELL type=LIMIT qty=0.01 price=84500.00 stop=None
+2025-03-27 10:20:31 | INFO     | trading_bot.orders | Placing SELL LIMIT order | symbol=BTCUSDT qty=0.01 price=84500.00
+2025-03-27 10:20:31 | DEBUG    | trading_bot.client | POST https://testnet.binancefuture.com/fapi/v1/order | params={'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'LIMIT', 'quantity': '0.01', 'timeInForce': 'GTC', 'price': '84500.00', 'timestamp': 1743067231555, 'recvWindow': 5000}
+2025-03-27 10:20:31 | DEBUG    | trading_bot.client | Response | status=400 | body={"code":-4003,"msg":"Quantity less than or equal to zero."}
+2025-03-27 10:20:31 | ERROR    | trading_bot.client | API error | code=-4003 | msg=Quantity less than or equal to zero.
+2025-03-27 10:20:31 | ERROR    | trading_bot.orders | Order placement failed: Binance API error -4003: Quantity less than or equal to zero.
